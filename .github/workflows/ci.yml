@@ -76,7 +76,7 @@ jobs:
   package-validation:
     uses: TheIvoryDisaster/GutenStructure/.github/workflows/package-validation.yml@5dc76952e11014b8c75699f474734c4e444eb5ea
     with:
-      mod-folder: ExampleMod
+      mod-folder: Storage
       empty-data-mod: true
   release-readiness:
     name: Release readiness

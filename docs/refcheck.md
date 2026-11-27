@@ -26,7 +26,7 @@ CACHE=<dir> tools/refcheck.sh       # where downloaded release DLLs are kept
 Output, one line per release and assembly:
 
 ```
-v0.21.0 ExampleMod/ExampleMod.dll: 1 engine references checked, 0 missing
+v0.21.0 Storage/Storage.dll: 1 engine references checked, 0 missing
 ```
 
 or, for a break:

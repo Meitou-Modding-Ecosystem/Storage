@@ -7,9 +7,9 @@ signed in to the Steam account that will own the item.
 The commands use these values. Set them once per PowerShell window:
 
 ```powershell
-$Repo = "Meitou-Modding-Ecosystem/ExampleMod"
-$Slug = "example-mod"
-$Mod = "ExampleMod"
+$Repo = "Meitou-Modding-Ecosystem/Storage"
+$Slug = "storage"
+$Mod = "Storage"
 $Version = "0.1.0"
 $Work = "$HOME\Downloads\$Mod-Workshop"
 $Watcher = "$env:LOCALAPPDATA\WorkshopWatcher\WorkshopWatcher.ps1"
@@ -24,15 +24,15 @@ $SteamUser = "your Steam account name"
 | `$Version` | The release's version, without a `v`. Changes with each release. | `version` in the mod's `meitou.json`, or the release's title. |
 | `$SteamUser` | The name you sign in to Steam with, as given to the Workshop Watcher installer. | Your Steam login. |
 
-A release's tag is `$Slug-v$Version` (`example-mod-v0.1.0`) and its ZIP is `$Mod-$Version.zip` (`ExampleMod-0.1.0.zip`), so the ZIP
+A release's tag is `$Slug-v$Version` (`storage-v0.1.0`) and its ZIP is `$Mod-$Version.zip` (`Storage-0.1.0.zip`), so the ZIP
 downloads from `https://github.com/$Repo/releases/download/$Slug-v$Version/$Mod-$Version.zip`. Copy `$Version` from a release that is not
-marked **Pre-release**: the `example-mod-beta` and `example-mod-<version>-beta.<commit>` prereleases have other tags and ZIP names.
+marked **Pre-release**: the `storage-beta` and `storage-<version>-beta.<commit>` prereleases have other tags and ZIP names.
 
 ## 1. Release the mod
 
 1. Merge `beta` into `main`, then open and merge a PR from `main` into `release` ([Branches](../README.md#branches)).
 2. Wait for the Release workflow on `release`. It tags the merge `<slug>-v<version>` with the version in `meitou.json` (for example
-   `example-mod-v0.1.0`) and creates a release with `<Mod>-<version>.zip` and `<Mod>-<version>.zip.sha256`. If that run fails before
+   `storage-v0.1.0`) and creates a release with `<Mod>-<version>.zip` and `<Mod>-<version>.zip.sha256`. If that run fails before
    tagging, `powershell -ExecutionPolicy Bypass -File tools\Tag-Release.ps1` pushes the tag by hand (`-DryRun` only prints the commands).
 
 ## 2. Install Workshop Watcher and sign in to Steam

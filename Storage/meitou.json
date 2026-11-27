@@ -1,0 +1,10 @@
+{
+  "id": "storage",
+  "version": "0.1.0",
+  "apiVersion": 3,
+  "gameVersion": ">=0.24.0",
+  "assemblies": [
+    "Storage.dll"
+  ],
+  "entry": "Storage.StorageMod"
+}

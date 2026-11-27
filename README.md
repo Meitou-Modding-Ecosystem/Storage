@@ -1,7 +1,8 @@
-# Meitou mod template
+# Storage
 
-Template for a [MeitouClient](https://github.com/Meitou-Modding-Ecosystem/MeitouClient) code mod repo in the Meitou-Modding-Ecosystem
-org. GPL-3.0-or-later.
+A [MeitouClient](https://github.com/Meitou-Modding-Ecosystem/MeitouClient) code mod: an Edo-period granary storehouse with a large general
+inventory, storage filters, up to three Storehouse haulers and a hauling network that links the storages and machines within 1500 m.
+GPL-3.0-or-later. What it does and how: [docs/storage.md](docs/storage.md).
 
 - Build and run locally with Visual Studio, VS Code or the terminal (this repo's engine or the installed launcher, deployed to the game): [docs/play.md](docs/play.md).
 - Setting up the repos on your machine: [docs/local-development.md](docs/local-development.md).
@@ -10,17 +11,9 @@ org. GPL-3.0-or-later.
   `.claude/skills/meitou-engine-release`.
 - Checking a built mod against the newest Meitou release (CI does it on every PR): [docs/refcheck.md](docs/refcheck.md).
 - Publishing the mod to the Steam Workshop for the first time, then on every release: [docs/steam-workshop.md](docs/steam-workshop.md).
-- Turning `.glb` models (Meshy, Hi3D, Blender) into buildable structures, no FCS needed: [docs/structures.md](docs/structures.md);
-  getting a generated model's polycount, size and textures right first: [docs/model-prep.md](docs/model-prep.md).
+- Turning `.glb` models into buildable structures: [docs/structures.md](docs/structures.md); model prep: [docs/model-prep.md](docs/model-prep.md).
 
-## Use this template
-
-1. Create the repo from this template on GitHub (Use this template > Create a new repository), then clone it with
-   `git clone --recurse-submodules <your repo URL>`.
-2. Rename `ExampleMod` to your mod's name: the folders `ExampleMod` and `ExampleMod.Tests`, the files inside them named `ExampleMod*`, the
-   `AssemblyName`/`RootNamespace` in both `.csproj` files, the namespaces, and the paths in `MeitouMod.slnx` (rename that file too).
-3. In `meitou.json` set `id` (`<author-or-mod>.<name>`), `assemblies` and `entry`; keep the version only there.
-   Ask for a number block if the mod will claim task types or dialogue codes, and fill in `## Numbers` below.
+## Numbers` below.
    In `.github/workflows/release.yml` set the tag prefix, `mod-folder` and `slug` (`<mod-name>`, as in the tag `<mod-name>-v<version>`).
 4. Open the `.slnx` in Visual Studio and press F5 ([docs/play.md](docs/play.md)).
 
@@ -29,10 +22,13 @@ org. GPL-3.0-or-later.
 Task types (`AddGoalType`, `AddJobType`) and dialogue codes (`AddDialogueCondition`, `AddDialogueEffect`) are shared by every loaded mod, and the
 game refuses a mod that claims one already taken. Each mod claims numbers only inside its own block of 100
 ([mod number blocks](https://github.com/TheIvoryDisaster/GutenStructure/blob/beta/docs/numbers.md)) and lists them here; `NumbersTests` checks
-the list against the block. Replace this paragraph with the mod's block line, e.g. `Block 4400-4499`, and a table:
+the list against the block.
+
+Block 5100-5199
 
 | Number | Pool | Use |
 | --- | --- | --- |
+| 5100 | Task type | Storehouse hauler job (`AddJobType`) |
 
 ## Layout
 
