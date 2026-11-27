@@ -1,5 +1,6 @@
 using Meitou.Game.Ui;
 using Meitou.Simulation.Items;
+using Meitou.Simulation.Production;
 using Storage.Filters;
 
 namespace Storage.Ui;
@@ -42,8 +43,9 @@ public sealed class FiltersTab(ManageWindow window) : IWindowTab
         body.Children.Add(kit.Label("Search", left, 0, 60, 26, kit.Keys.Head));
         body.Children.Add(kit.TextBox("storage-filter-search", _search, Kit.Args("f-search"), left + 64, 0, 260, 26));
         body.Children.Add(kit.Label("Haulers bring allowed items, highest tier first.", left + 340, 0, right - 340, 26, kit.Keys.Hint));
-        ScopeBar(body, kit, view, catalog, left, 34, right);
-        Items(body, kit, view, catalog, left, 72, right, height - 72);
+        Priorities(body, kit, view, left, 34, right);
+        ScopeBar(body, kit, view, catalog, left, 68, right);
+        Items(body, kit, view, catalog, left, 106, right, height - 106);
     }
 
     /// <summary>
@@ -78,6 +80,36 @@ public sealed class FiltersTab(ManageWindow window) : IWindowTab
         string text = level is { } set ? $"{caption}  ({FilterLevels.Name(set)})" : caption;
         return kit.Button(text, Kit.Args("f-cat", group, sub), 0, top, CategoryWidth - 16, RowHeight - 2,
             style: chosen ? kit.Keys.RowOn : kit.Keys.Row);
+    }
+
+    #endregion
+
+    #region Storage priorities
+
+    /// <summary>
+    /// The storage's own Put and Take priorities (the game's, which the building panel shows for other storages), each stepped down or up.
+    /// </summary>
+    static void Priorities(UiNode body, Kit kit, StorehouseView view, float left, float top, float width)
+    {
+        PriorityControl(body, kit, "Put priority", StorageUse.Put, view.PutPriority, left, top);
+        PriorityControl(body, kit, "Take priority", StorageUse.Take, view.TakePriority, left + 300, top);
+        body.Children.Add(kit.Label("Put: where the game's haulers store things first. Take: where workers take from first.", left + 600, top,
+            width - 600, 28, kit.Keys.Hint));
+    }
+
+    /// <summary>
+    /// One priority: its name and level, with the buttons that step it.
+    /// </summary>
+    static void PriorityControl(UiNode body, Kit kit, string name, StorageUse use, StoragePriority level, float left, float top)
+    {
+        string u = ((int)use).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string style = level == StoragePriority.Forbidden ? kit.Keys.Bad : level > StoragePriority.Normal ? kit.Keys.Head : kit.Keys.Text;
+        body.Children.Add(kit.Label(name + ":", left, top, 110, 28, kit.Keys.Head));
+        body.Children.Add(kit.Button("−", Kit.Args("f-prio", u, Code(StorageLevels.Down(level))), left + 112, top + 3, 26, 22,
+            level > StoragePriority.Forbidden));
+        body.Children.Add(kit.Label(FilterLevels.Name(level), left + 144, top, 100, 28, style));
+        body.Children.Add(kit.Button("+", Kit.Args("f-prio", u, Code(StorageLevels.Up(level))), left + 246, top + 3, 26, 22,
+            level < StoragePriority.Critical));
     }
 
     #endregion
@@ -185,9 +217,23 @@ public sealed class FiltersTab(ManageWindow window) : IWindowTab
             case "f-set":
                 Set(parts, view);
                 return true;
+            case "f-prio":
+                SetPriority(parts, view);
+                return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Sets the storage's Put or Take priority through the game's own command, and asks for a fresh view to show it.
+    /// </summary>
+    void SetPriority(string[] parts, StorehouseView view)
+    {
+        if (!int.TryParse(parts[1], out int use) || !int.TryParse(parts[2], out int level)) return;
+
+        window.Send(new SetStoragePriority(view.Site, (StorageUse)use, (StoragePriority)level) { Tick = 0 });
+        window.Send(new RescanCommand(view.Site) { Tick = 0 });
     }
 
     /// <summary>

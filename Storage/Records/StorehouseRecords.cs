@@ -73,6 +73,9 @@ public static class StorehouseRecords
         record.Bools["has inventory"] = true;
         record.Bools["has lock"] = false;
         record.Bools["creates player town"] = true;
+
+        // Nobody operates it: its haulers are a job of their own (the panel's Workers line reads "-", not General storage's 0/5).
+        record.Ints["max operators"] = 0;
         record.Ints["storage size width"] = GridWidth;
         record.Ints["storage size height"] = GridHeight;
         record.Ints["itemtype limit"] = (int)FcsRecordType.Item;

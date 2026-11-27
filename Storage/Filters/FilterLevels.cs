@@ -39,3 +39,19 @@ public static class FilterLevels
     /// </summary>
     public static string Name(StoragePriority level) => level.ToString();
 }
+
+/// <summary>
+/// The steps of a storage's own Put and Take priorities: Forbidden, then Low to Critical.
+/// </summary>
+public static class StorageLevels
+{
+    /// <summary>
+    /// The level above <paramref name="level"/>; Critical stays.
+    /// </summary>
+    public static StoragePriority Up(StoragePriority level) => level >= StoragePriority.Critical ? StoragePriority.Critical : level + 1;
+
+    /// <summary>
+    /// The level below <paramref name="level"/>; Forbidden stays.
+    /// </summary>
+    public static StoragePriority Down(StoragePriority level) => level <= StoragePriority.Forbidden ? StoragePriority.Forbidden : level - 1;
+}

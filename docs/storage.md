@@ -6,15 +6,17 @@ inventory, storage filters, a hauler job for up to three people and a hauling ne
 ## Storehouse
 
 - Record `1-Storage.mod`, made in the data phase from the imported look `900000-Storage.mod` plus General storage functionality
-  (`2950-gamedata.base`): a 16 × 12 grid of any item type, stacks ×4, 40 building materials, build category `STORAGE`. It is unlocked from the
-  start (`_Default Start`'s `enable buildings`).
+  (`2950-gamedata.base`): a 16 × 12 grid of any item type, stacks ×4, 40 building materials, build category `STORAGE`, `max operators` 0 (the
+  panel's Workers line reads "-"; General storage's own is 5). It is unlocked from the start (`_Default Start`'s `enable buildings`).
 - It can only be built outside: a ghost standing in or on another building is refused ("A storehouse must be built outside.").
 - Its range is 1500 m (15000 world units) on the ground plane.
 
 ## Manage storehouse
 
-Clicking the storehouse opens its inventory as any storage's. Its building panel adds **Assign selected: Storehouse hauler** and **Manage
-storehouse**, which opens the window with three tabs. The window reads the system's published views and changes the world only through
+Clicking the storehouse opens its inventory as any storage's. Its building panel adds one button, **Manage storehouse**, which opens the window
+with three tabs, and a **Haulers** bar (n/3) under Condition. The panel clips lines past its lower edge and other mods add lines too, so the
+mod adds no other button: Assign selected is on the Hauling network tab and the right-click menu's Work as. **Ctrl+M** opens or closes the
+selected storehouse's window as well, and **Esc** closes it. The window reads the system's published views and changes the world only through
 commands, so it never races the simulation.
 
 Setting **Inventory reach (m)** (100 to 500, default 100) is how far a selected character may stand and still open the inventory with a click,
@@ -30,6 +32,8 @@ Deferred, Normal, Preferred, Important, High, Critical (the engine's `StoragePri
   settings under it; Reset returns to inheriting.
 - The storehouse's storage takes only allowed items (`IStorageFilter`), and the game's own haulers rank it by tier (`IStoragePriority`).
 - The search box lists matching items from every category.
+- The storage's own **Put priority** and **Take priority** (the game's, which the panel shows for every storage) are set here, from Forbidden to
+  Critical, through the game's `SetStoragePriority`. The engine still shows them on the panel too (no engine hook hides them yet).
 
 ## Hauling network
 

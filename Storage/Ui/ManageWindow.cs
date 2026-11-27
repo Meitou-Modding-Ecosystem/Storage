@@ -131,6 +131,16 @@ public sealed class ManageWindow
     public Filters.ItemCatalog? Catalog => _system()?.Catalog;
 
     /// <summary>
+    /// Whether the window is open.
+    /// </summary>
+    public bool IsOpen => _open;
+
+    /// <summary>
+    /// Closes the window.
+    /// </summary>
+    public void Close() => _open = false;
+
+    /// <summary>
     /// Whether the window shows <paramref name="storehouse"/>.
     /// </summary>
     public bool Shows(string storehouse) => _open && _storehouse == storehouse;

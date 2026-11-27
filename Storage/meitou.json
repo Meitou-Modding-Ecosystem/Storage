@@ -1,6 +1,6 @@
 {
   "id": "storage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "apiVersion": 3,
   "gameVersion": ">=0.24.0",
   "assemblies": [
