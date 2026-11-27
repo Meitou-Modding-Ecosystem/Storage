@@ -283,8 +283,13 @@ public sealed class StorageSystem(ScanData data) : ITickSystem, IStateHashed, IM
             if (world.Buildings.Find(id) is not { } site || !_storehouses.TryGetValue(id, out var state)) continue;
 
             string name = NetworkScan.NameOf(site, data.BuildingName);
+            var machine = world.Machines.Find(id);
             views[id] = new StorehouseView(id, name, state.Filter.Copy(), state.Network.Copy(), [.. scan.Nodes.Values], scan.Inventory,
-                HaulerLines(world, id), world.Tick);
+                HaulerLines(world, id), world.Tick)
+            {
+                PutPriority = machine?.PutPriority ?? StoragePriority.Normal,
+                TakePriority = machine?.TakePriority ?? StoragePriority.Normal,
+            };
         }
 
         _views = views;

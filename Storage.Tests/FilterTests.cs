@@ -80,6 +80,16 @@ public sealed class FilterTests
     [InlineData(StoragePriority.Low, StoragePriority.Low)]
     public void Down_steps_one_tier_and_never_forbids(StoragePriority from, StoragePriority to) => Assert.Equal(to, FilterLevels.Down(from));
 
+    [Theory]
+    [InlineData(StoragePriority.Low, StoragePriority.Forbidden)]
+    [InlineData(StoragePriority.Forbidden, StoragePriority.Forbidden)]
+    public void A_storage_priority_steps_down_to_forbidden(StoragePriority from, StoragePriority to) => Assert.Equal(to, StorageLevels.Down(from));
+
+    [Theory]
+    [InlineData(StoragePriority.Forbidden, StoragePriority.Low)]
+    [InlineData(StoragePriority.Critical, StoragePriority.Critical)]
+    public void A_storage_priority_steps_up_to_critical(StoragePriority from, StoragePriority to) => Assert.Equal(to, StorageLevels.Up(from));
+
     [Fact]
     public void Toggle_forbids_and_allows_at_normal()
     {
