@@ -1,0 +1,36 @@
+# Gives the repository its permanent branches: beta (from the default branch when missing), then main and release from beta
+# (GutenStructure docs/branch-policy.md). A repo created from this template gets only the default branch, so its first push runs this.
+# Branches made with the workflow's own token start no workflows, so creating release publishes nothing; the first release is the first
+# main -> release promotion. Existing branches are never moved.
+name: Permanent branches
+
+on:
+  push:
+    branches: [beta]
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  branches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Create beta, main and release where missing
+        run: |
+          has() { gh api "repos/$REPO/git/ref/heads/$1" --silent 2>/dev/null; }
+          make() { gh api "repos/$REPO/git/refs" -f ref="refs/heads/$1" -f sha="$2" --silent; echo "Created $1 at $2" >> "$GITHUB_STEP_SUMMARY"; }
+          if ! has beta; then
+            default=$(gh api "repos/$REPO" --jq .default_branch)
+            make beta "$(gh api "repos/$REPO/git/ref/heads/$default" --jq .object.sha)"
+          fi
+          beta=$(gh api "repos/$REPO/git/ref/heads/beta" --jq .object.sha)
+          for branch in main release; do has "$branch" || make "$branch" "$beta"; done
