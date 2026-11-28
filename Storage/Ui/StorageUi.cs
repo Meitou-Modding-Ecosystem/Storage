@@ -1,3 +1,4 @@
+using Meitou.Game.Host.Input;
 using Meitou.Game.Ui;
 using Meitou.Modding;
 using Meitou.Simulation;
@@ -36,7 +37,19 @@ public sealed class StorageUi : IUiExtension
         _system = system;
         _window = new ManageWindow(system, context, () => _selected);
         context.AddFrame(frame => _selected = frame.Selected);
+        context.AddKeyAction(KeyName, "Manage storehouse", Pressed, Binding.Of(DefaultKey));
     }
+
+    /// <summary>
+    /// The Manage storehouse key action's saved name.
+    /// </summary>
+    public const string KeyName = "manage-storehouse";
+
+    /// <summary>
+    /// The Manage storehouse key's default: N, which no game action holds (Ctrl is the camera's pivot and M the map); the player rebinds it on the
+    /// Controls page.
+    /// </summary>
+    public const Key DefaultKey = Meitou.Game.Host.Input.Key.N;
 
     public string Id => StorageMod.Id;
 
@@ -63,21 +76,24 @@ public sealed class StorageUi : IUiExtension
     }
 
     /// <summary>
-    /// The window's keys: Esc closes it; Ctrl+M opens (or closes) the selected storehouse's, should the panel's button be crowded out.
+    /// The window's key: Esc closes it.
     /// </summary>
     bool Key(UiKeyInput input)
     {
-        if (input.Cancel && _window.IsOpen)
-        {
-            _window.Close();
-            return true;
-        }
+        if (!input.Cancel || !_window.IsOpen) return false;
 
-        if (input.Key != Meitou.Game.Host.Input.Key.M || !input.Ctrl || input.Shift || input.Alt) return false;
-        if (input.Snapshot.InspectedBuilding?.Instance is not { } site || _system()?.Views.ContainsKey(site) != true) return false;
+        _window.Close();
+        return true;
+    }
+
+    /// <summary>
+    /// The Manage storehouse key (N by default): opens or closes the inspected storehouse's window, should the panel's button be crowded out.
+    /// </summary>
+    void Pressed(ModKeyContext context)
+    {
+        if (context.Snapshot.InspectedBuilding?.Instance is not { } site || _system()?.Views.ContainsKey(site) != true) return;
 
         _window.Toggle(site);
-        return true;
     }
 
     /// <summary>
