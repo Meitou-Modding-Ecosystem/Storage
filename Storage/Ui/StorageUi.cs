@@ -69,8 +69,13 @@ public sealed class StorageUi : IUiExtension
     /// </summary>
     IEnumerable<UiBuildingAction> Lines(UiBuildingContext context)
     {
-        if (StorehouseOf(context) is not { } site) return [];
+        if (StorehouseOf(context) is not { } site)
+        {
+            _panel = null;
+            return [];
+        }
 
+        _panel = new PanelShows(site, Environment.TickCount64);
         string caption = _window.Shows(site) ? "Close storehouse settings" : "Manage storehouse";
         return [new UiBuildingAction(caption, "Storage filters and priorities, the hauling network and everything in range.", () => _window.Toggle(site))];
     }
@@ -87,14 +92,24 @@ public sealed class StorageUi : IUiExtension
     }
 
     /// <summary>
-    /// The Manage storehouse key (N by default): opens or closes the inspected storehouse's window, should the panel's button be crowded out.
+    /// The Manage storehouse key (N by default): opens or closes the window of the storehouse whose panel shows, should the panel's button be
+    /// crowded out; with no storehouse panel showing it closes an open window.
     /// </summary>
+    /// <remarks>
+    /// The snapshot's <c>InspectedBuilding</c> is published only for a building with doors, a lock or contents of its own fixtures, so it is null for
+    /// a storehouse the player built; the panel's own source (<see cref="Lines"/>) says which storehouse it shows instead.
+    /// </remarks>
     void Pressed(ModKeyContext context)
     {
-        if (context.Snapshot.InspectedBuilding?.Instance is not { } site || _system()?.Views.ContainsKey(site) != true) return;
-
-        _window.Toggle(site);
+        if (PanelShows.Current(_panel, Environment.TickCount64) is { } site && _system()?.Views.ContainsKey(site) == true) _window.Toggle(site);
+        else if (_window.IsOpen) _window.Close();
     }
+
+    /// <summary>
+    /// The storehouse whose panel was last arranged and when (<see cref="Environment.TickCount64"/>); null while the panel shows another building.
+    /// Host thread.
+    /// </summary>
+    PanelShows? _panel;
 
     /// <summary>
     /// The storehouse's Haulers bar under Condition: its haulers out of three.
@@ -118,4 +133,21 @@ public sealed class StorageUi : IUiExtension
 
         return building.SiteId;
     }
+}
+
+/// <summary>
+/// The storehouse a building panel showed (<paramref name="Site"/>) at <paramref name="At"/> (milliseconds, <see cref="Environment.TickCount64"/>).
+/// The panel is arranged at least 20 times a second while a building is selected, so a sighting older than <see cref="FreshMs"/> means it closed.
+/// </summary>
+public sealed record PanelShows(string Site, long At)
+{
+    /// <summary>
+    /// How long a sighting of the panel holds, milliseconds.
+    /// </summary>
+    public const long FreshMs = 500;
+
+    /// <summary>
+    /// The storehouse <paramref name="last"/> saw if it is still fresh at <paramref name="now"/>; null otherwise.
+    /// </summary>
+    public static string? Current(PanelShows? last, long now) => last is { } seen && now - seen.At <= FreshMs ? seen.Site : null;
 }

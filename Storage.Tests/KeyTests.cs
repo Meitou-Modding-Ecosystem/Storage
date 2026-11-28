@@ -20,4 +20,14 @@ public sealed class KeyTests
 
         foreach (var action in Enum.GetValues<InputAction>()) Assert.DoesNotContain(key, bindings.Get(action));
     }
+
+    [Fact]
+    public void The_key_finds_the_storehouse_while_its_panel_is_fresh()
+    {
+        var seen = new PanelShows("site-7", 10_000);
+
+        Assert.Equal("site-7", PanelShows.Current(seen, 10_000 + PanelShows.FreshMs));
+        Assert.Null(PanelShows.Current(seen, 10_001 + PanelShows.FreshMs));
+        Assert.Null(PanelShows.Current(null, 10_000));
+    }
 }
