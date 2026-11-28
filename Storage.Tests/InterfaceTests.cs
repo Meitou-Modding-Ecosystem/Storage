@@ -100,6 +100,14 @@ public sealed class InterfaceTests
     }
 
     [Fact]
+    public void The_manage_key_defaults_to_Alt_M_and_never_uses_Ctrl()
+    {
+        // Ctrl turns the camera and M alone opens the map, so the default is a chord with Alt only.
+        Assert.Equal(Meitou.Game.Host.Input.Key.M, StorageUi.KeyDefault.Key);
+        Assert.Equal(Meitou.Game.Host.Input.KeyModifiers.Alt, StorageUi.KeyDefault.Modifiers);
+    }
+
+    [Fact]
     public void A_storehouse_must_stand_outside()
     {
         var storehouse = new BuildingBuildData { Id = Ids.Storehouse, Name = "Storehouse" };

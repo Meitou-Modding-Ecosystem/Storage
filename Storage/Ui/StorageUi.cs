@@ -29,6 +29,21 @@ public sealed class StorageUi : IUiExtension
     readonly ManageWindow _window;
 
     /// <summary>
+    /// The storehouse whose panel was last arranged: its instance (as <c>InspectedBuilding</c> names it) and its site; null while the panel shows
+    /// another building. Host thread.
+    /// </summary>
+    (string Instance, string Site)? _panel;
+
+    /// <summary>
+    /// The Manage storehouse key action's name and default binding (Alt+M: Ctrl turns the camera and M alone opens the map). The player rebinds it
+    /// on the Controls page.
+    /// </summary>
+    public const string KeyName = "manage-storehouse", KeyLabel = "Manage storehouse";
+
+    public static readonly Meitou.Game.Host.Input.Binding KeyDefault =
+        Meitou.Game.Host.Input.Binding.Of(Meitou.Game.Host.Input.Key.M).With(Meitou.Game.Host.Input.KeyModifiers.Alt);
+
+    /// <summary>
     /// The interface over <paramref name="system"/>; registers a frame callback on <paramref name="context"/> for the selection.
     /// </summary>
     public StorageUi(Func<StorageSystem?> system, ModContext context)
@@ -36,6 +51,18 @@ public sealed class StorageUi : IUiExtension
         _system = system;
         _window = new ManageWindow(system, context, () => _selected);
         context.AddFrame(frame => _selected = frame.Selected);
+        context.AddKeyAction(KeyName, KeyLabel, Pressed, KeyDefault);
+    }
+
+    /// <summary>
+    /// The Manage storehouse key: opens (or closes) the window of the selected storehouse, the one whose panel shows.
+    /// </summary>
+    void Pressed(Meitou.Game.Host.Input.ModKeyContext context)
+    {
+        if (_panel is not { } panel || context.Snapshot.InspectedBuilding?.Instance != panel.Instance) return;
+        if (_system()?.Views.ContainsKey(panel.Site) != true) return;
+
+        _window.Toggle(panel.Site);
     }
 
     public string Id => StorageMod.Id;
@@ -56,27 +83,25 @@ public sealed class StorageUi : IUiExtension
     /// </summary>
     IEnumerable<UiBuildingAction> Lines(UiBuildingContext context)
     {
-        if (StorehouseOf(context) is not { } site) return [];
+        if (StorehouseOf(context) is not { } site)
+        {
+            _panel = null;
+            return [];
+        }
 
+        _panel = (context.Building.Instance, site);
         string caption = _window.Shows(site) ? "Close storehouse settings" : "Manage storehouse";
         return [new UiBuildingAction(caption, "Storage filters and priorities, the hauling network and everything in range.", () => _window.Toggle(site))];
     }
 
     /// <summary>
-    /// The window's keys: Esc closes it; Ctrl+M opens (or closes) the selected storehouse's, should the panel's button be crowded out.
+    /// The window's key: Esc closes it. (Opening it from the keyboard is the Manage storehouse key action, <see cref="Pressed"/>.)
     /// </summary>
     bool Key(UiKeyInput input)
     {
-        if (input.Cancel && _window.IsOpen)
-        {
-            _window.Close();
-            return true;
-        }
+        if (!input.Cancel || !_window.IsOpen) return false;
 
-        if (input.Key != Meitou.Game.Host.Input.Key.M || !input.Ctrl || input.Shift || input.Alt) return false;
-        if (input.Snapshot.InspectedBuilding?.Instance is not { } site || _system()?.Views.ContainsKey(site) != true) return false;
-
-        _window.Toggle(site);
+        _window.Close();
         return true;
     }
 
