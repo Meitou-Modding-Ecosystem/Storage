@@ -20,4 +20,17 @@ public sealed class KeyTests
 
         foreach (var action in Enum.GetValues<InputAction>()) Assert.DoesNotContain(key, bindings.Get(action));
     }
+
+    /// <summary>
+    /// The key opens the storehouse whose panel is up, and none once the panel has not been laid out for a few frames (another building picked,
+    /// or nothing).
+    /// </summary>
+    [Fact]
+    public void The_key_finds_the_storehouse_whose_panel_is_up()
+    {
+        Assert.Equal("site-1", StorageUi.ShownStorehouse(("site-1", 100), 100));
+        Assert.Equal("site-1", StorageUi.ShownStorehouse(("site-1", 100), 100 + StorageUi.PanelFrames));
+        Assert.Null(StorageUi.ShownStorehouse(("site-1", 100), 101 + StorageUi.PanelFrames));
+        Assert.Null(StorageUi.ShownStorehouse(null, 100));
+    }
 }

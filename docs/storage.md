@@ -16,7 +16,7 @@ inventory, storage filters, a hauler job for up to three people and a hauling ne
 Clicking the storehouse opens its inventory as any storage's. Its building panel adds one button, **Manage storehouse**, which opens the window
 with three tabs, and a **Haulers** bar (n/3) under Condition. The panel clips lines past its lower edge and other mods add lines too, so the
 mod adds no other button: Assign selected is on the Hauling network tab and the right-click menu's Work as. The **Manage storehouse** key (N by default, rebound on the
-settings' Controls page) opens or closes the inspected storehouse's window as well, and **Esc** closes it. The window reads the system's published views and changes the world only through
+settings' Controls page) opens or closes the selected storehouse's window as well (while its panel is up), and **Esc** closes it. The window reads the system's published views and changes the world only through
 commands, so it never races the simulation.
 
 Setting **Inventory reach (m)** (100 to 500, default 100) is how far a selected character may stand and still open the inventory with a click,
