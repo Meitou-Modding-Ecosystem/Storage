@@ -2,7 +2,7 @@
   "id": "storage",
   "version": "0.1.2",
   "apiVersion": 3,
-  "gameVersion": ">=0.24.0",
+  "gameVersion": ">=0.24.1",
   "assemblies": [
     "Storage.dll"
   ],
